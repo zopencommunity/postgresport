@@ -1,0 +1,13 @@
+diff --git a/src/backend/tcop/postgres.c b/src/backend/tcop/postgres.c
+index 1ae51b1b391..e3e179fa89e 100644
+--- a/src/backend/tcop/postgres.c
++++ b/src/backend/tcop/postgres.c
+@@ -5110,7 +5110,7 @@ ShowUsage(const char *title)
+ 					 (long) user.tv_usec,
+ 					 (long) sys.tv_sec,
+ 					 (long) sys.tv_usec);
+-#ifndef WIN32
++#if !defined(WIN32) && !defined(__MVS__)
+ 
+ 	/*
+ 	 * The following rusage fields are not defined by POSIX, but they're

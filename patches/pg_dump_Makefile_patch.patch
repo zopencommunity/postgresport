@@ -1,0 +1,12 @@
+diff --git a/src/bin/pg_dump/Makefile b/src/bin/pg_dump/Makefile
+index fa795883e9f..214cc002bec 100644
+--- a/src/bin/pg_dump/Makefile
++++ b/src/bin/pg_dump/Makefile
+@@ -23,6 +23,7 @@ export with_icu
+ 
+ override CPPFLAGS := -I$(libpq_srcdir) $(CPPFLAGS)
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport)
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ OBJS = \
+ 	$(WIN32RES) \

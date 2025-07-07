@@ -1,0 +1,15 @@
+diff --git a/src/port/chklocale.c b/src/port/chklocale.c
+index 034939f7fd2..78a1f42c4a5 100644
+--- a/src/port/chklocale.c
++++ b/src/port/chklocale.c
+@@ -322,8 +322,9 @@ pg_get_encoding_from_locale(const char *ctype, bool write_message)
+ 	loc = newlocale(LC_CTYPE_MASK, ctype, (locale_t) 0);
+ 	if (loc == (locale_t) 0)
+ 		return -1;				/* bogus ctype passed in? */
+-
++#ifndef __MVS__
+ 	sys = nl_langinfo_l(CODESET, loc);
++#endif
+ 	if (sys)
+ 		sys = strdup(sys);
+ 

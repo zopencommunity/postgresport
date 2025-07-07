@@ -1,0 +1,13 @@
+diff --git a/src/bin/scripts/Makefile b/src/bin/scripts/Makefile
+index f6b4d40810b..ad1ad9c0538 100644
+--- a/src/bin/scripts/Makefile
++++ b/src/bin/scripts/Makefile
+@@ -20,7 +20,7 @@ PROGRAMS = createdb createuser dropdb dropuser clusterdb vacuumdb reindexdb pg_i
+ 
+ override CPPFLAGS := -I$(libpq_srcdir) $(CPPFLAGS)
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport)
+-
++LIBS+=$(LDFLAGS_INTERNAL)
+ all: $(PROGRAMS)
+ 
+ createdb: createdb.o common.o $(WIN32RES) | submake-libpq submake-libpgport submake-libpgfeutils

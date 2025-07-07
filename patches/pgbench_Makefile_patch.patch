@@ -1,0 +1,12 @@
+diff --git a/src/bin/pgbench/Makefile b/src/bin/pgbench/Makefile
+index 987bf64df9d..ca39852b407 100644
+--- a/src/bin/pgbench/Makefile
++++ b/src/bin/pgbench/Makefile
+@@ -15,6 +15,7 @@ OBJS = \
+ 
+ override CPPFLAGS := -I. -I$(srcdir) -I$(libpq_srcdir) $(CPPFLAGS)
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport)
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ ifneq ($(PORTNAME), win32)
+ override CFLAGS += $(PTHREAD_CFLAGS)

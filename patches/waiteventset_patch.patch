@@ -1,0 +1,139 @@
+diff --git a/src/backend/storage/ipc/waiteventset.c b/src/backend/storage/ipc/waiteventset.c
+index 7c0e66900f9..574ced67132 100644
+--- a/src/backend/storage/ipc/waiteventset.c
++++ b/src/backend/storage/ipc/waiteventset.c
+@@ -86,7 +86,7 @@
+ #if defined(WAIT_USE_EPOLL) || defined(WAIT_USE_POLL) || \
+ 	defined(WAIT_USE_KQUEUE) || defined(WAIT_USE_WIN32)
+ /* don't overwrite manual choice */
+-#elif defined(HAVE_SYS_EPOLL_H)
++#elif defined(HAVE_SYS_EPOLL_H) && ! defined (__MVS__)
+ #define WAIT_USE_EPOLL
+ #elif defined(HAVE_KQUEUE)
+ #define WAIT_USE_KQUEUE
+@@ -142,7 +142,7 @@ struct WaitEventSet
+ 	 */
+ 	bool		exit_on_postmaster_death;
+ 
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ 	int			epoll_fd;
+ 	/* epoll_wait returns events in a user provided arrays, allocate once */
+ 	struct epoll_event *epoll_ret_events;
+@@ -192,7 +192,7 @@ static void sendSelfPipeByte(void);
+ static void drain(void);
+ #endif
+ 
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ static void WaitEventAdjustEpoll(WaitEventSet *set, WaitEvent *event, int action);
+ #elif defined(WAIT_USE_KQUEUE)
+ static void WaitEventAdjustKqueue(WaitEventSet *set, WaitEvent *event, int old_events);
+@@ -202,7 +202,7 @@ static void WaitEventAdjustPoll(WaitEventSet *set, WaitEvent *event);
+ static void WaitEventAdjustWin32(WaitEventSet *set, WaitEvent *event);
+ #endif
+ 
+-static inline int WaitEventSetWaitBlock(WaitEventSet *set, int cur_timeout,
++int WaitEventSetWaitBlock(WaitEventSet *set, int cur_timeout,
+ 										WaitEvent *occurred_events, int nevents);
+ 
+ /* ResourceOwner support to hold WaitEventSets */
+@@ -375,7 +375,7 @@ CreateWaitEventSet(ResourceOwner resowner, int nevents)
+ 	sz += MAXALIGN(sizeof(WaitEventSet));
+ 	sz += MAXALIGN(sizeof(WaitEvent) * nevents);
+ 
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ 	sz += MAXALIGN(sizeof(struct epoll_event) * nevents);
+ #elif defined(WAIT_USE_KQUEUE)
+ 	sz += MAXALIGN(sizeof(struct kevent) * nevents);
+@@ -397,7 +397,7 @@ CreateWaitEventSet(ResourceOwner resowner, int nevents)
+ 	set->events = (WaitEvent *) data;
+ 	data += MAXALIGN(sizeof(WaitEvent) * nevents);
+ 
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ 	set->epoll_ret_events = (struct epoll_event *) data;
+ 	data += MAXALIGN(sizeof(struct epoll_event) * nevents);
+ #elif defined(WAIT_USE_KQUEUE)
+@@ -421,7 +421,7 @@ CreateWaitEventSet(ResourceOwner resowner, int nevents)
+ 		set->owner = resowner;
+ 	}
+ 
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ 	if (!AcquireExternalFD())
+ 		elog(ERROR, "AcquireExternalFD, for epoll_create1, failed: %m");
+ 	set->epoll_fd = epoll_create1(EPOLL_CLOEXEC);
+@@ -485,7 +485,7 @@ FreeWaitEventSet(WaitEventSet *set)
+ 		set->owner = NULL;
+ 	}
+ 
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ 	close(set->epoll_fd);
+ 	ReleaseExternalFD();
+ #elif defined(WAIT_USE_KQUEUE)
+@@ -522,7 +522,7 @@ FreeWaitEventSet(WaitEventSet *set)
+ void
+ FreeWaitEventSetAfterFork(WaitEventSet *set)
+ {
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ 	close(set->epoll_fd);
+ 	ReleaseExternalFD();
+ #elif defined(WAIT_USE_KQUEUE)
+@@ -631,7 +631,7 @@ AddWaitEventToSet(WaitEventSet *set, uint32 events, pgsocket fd, Latch *latch,
+ 	}
+ 
+ 	/* perform wait primitive specific initialization, if needed */
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ 	WaitEventAdjustEpoll(set, event, EPOLL_CTL_ADD);
+ #elif defined(WAIT_USE_KQUEUE)
+ 	WaitEventAdjustKqueue(set, event, 0);
+@@ -718,7 +718,7 @@ ModifyWaitEvent(WaitEventSet *set, int pos, uint32 events, Latch *latch)
+ #endif
+ 	}
+ 
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ 	WaitEventAdjustEpoll(set, event, EPOLL_CTL_MOD);
+ #elif defined(WAIT_USE_KQUEUE)
+ 	WaitEventAdjustKqueue(set, event, old_events);
+@@ -729,7 +729,7 @@ ModifyWaitEvent(WaitEventSet *set, int pos, uint32 events, Latch *latch)
+ #endif
+ }
+ 
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ /*
+  * action can be one of EPOLL_CTL_ADD | EPOLL_CTL_MOD | EPOLL_CTL_DEL
+  */
+@@ -1167,7 +1167,7 @@ WaitEventSetWait(WaitEventSet *set, long timeout,
+ }
+ 
+ 
+-#if defined(WAIT_USE_EPOLL)
++#if defined(WAIT_USE_EPOLL) && !defined (__MVS__)
+ 
+ /*
+  * Wait using linux's epoll_wait(2).
+@@ -1177,7 +1177,7 @@ WaitEventSetWait(WaitEventSet *set, long timeout,
+  * epoll_event struct contain a pointer to our events, making association
+  * easy.
+  */
+-static inline int
++int
+ WaitEventSetWaitBlock(WaitEventSet *set, int cur_timeout,
+ 					  WaitEvent *occurred_events, int nevents)
+ {
+@@ -1466,7 +1466,7 @@ WaitEventSetWaitBlock(WaitEventSet *set, int cur_timeout,
+  * This allows to receive readiness notifications for several events at once,
+  * but requires iterating through all of set->pollfds.
+  */
+-static inline int
++int
+ WaitEventSetWaitBlock(WaitEventSet *set, int cur_timeout,
+ 					  WaitEvent *occurred_events, int nevents)
+ {

@@ -1,0 +1,12 @@
+diff --git a/src/bin/pg_basebackup/Makefile b/src/bin/pg_basebackup/Makefile
+index a9557c0789f..2cc04de0938 100644
+--- a/src/bin/pg_basebackup/Makefile
++++ b/src/bin/pg_basebackup/Makefile
+@@ -28,6 +28,7 @@ export GZIP_PROGRAM=$(GZIP)
+ 
+ override CPPFLAGS := -I$(libpq_srcdir) $(CPPFLAGS)
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport)
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ OBJS = \
+ 	$(WIN32RES) \

@@ -1,0 +1,44 @@
+diff --git a/src/backend/storage/ipc/dsm_impl.c b/src/backend/storage/ipc/dsm_impl.c
+index 6bf8ab5bb5b..88d2f0e9783 100644
+--- a/src/backend/storage/ipc/dsm_impl.c
++++ b/src/backend/storage/ipc/dsm_impl.c
+@@ -254,7 +254,7 @@ dsm_impl_posix(dsm_op op, dsm_handle handle, Size request_size,
+ 	 * ReserveExternalFD rather than AcquireExternalFD, though.
+ 	 */
+ 	ReserveExternalFD();
+-
++#if defined(HAVE_SHM_OPEN) && !defined(__MVS__)
+ 	flags = O_RDWR | (op == DSM_OP_CREATE ? O_CREAT | O_EXCL : 0);
+ 	if ((fd = shm_open(name, flags, PG_FILE_MODE_OWNER)) == -1)
+ 	{
+@@ -266,7 +266,29 @@ dsm_impl_posix(dsm_op op, dsm_handle handle, Size request_size,
+ 							name)));
+ 		return false;
+ 	}
+-
++#endif
++#if defined(__MVS__)
++	/* On z/OS, test for System V shared memory availability */
++	int shmid;
++	void *addr;
++	shmid = shmget(IPC_PRIVATE, 4096, IPC_CREAT | IPC_EXCL | 0600);
++	if (shmid != -1)
++	{
++		addr = shmat(shmid, NULL, 0);
++		if (addr != (void *) -1)
++		{
++			shmdt(addr);
++			shmctl(shmid, IPC_RMID, NULL);
++			// return "sysv";
++			return false;
++		}
++		else
++		{
++			shmctl(shmid, IPC_RMID, NULL);
++			return true;
++		}
++	}
++#endif
+ 	/*
+ 	 * If we're attaching the segment, determine the current size; if we are
+ 	 * creating the segment, set the size to the requested value.

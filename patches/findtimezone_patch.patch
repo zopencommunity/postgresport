@@ -1,0 +1,195 @@
+diff --git a/src/bin/initdb/findtimezone.c b/src/bin/initdb/findtimezone.c
+index 2b2ae39adf3..3e462d7dfd8 100644
+--- a/src/bin/initdb/findtimezone.c
++++ b/src/bin/initdb/findtimezone.c
+@@ -231,7 +231,7 @@ compare_tm(struct tm *s, struct pg_tm *p)
+  * test time.
+  */
+ static int
+-score_timezone(const char *tzname, struct tztry *tt)
++score_timezone(const char *_tzname, struct tztry *tt)
+ {
+ 	int			i;
+ 	pg_time_t	pgtt;
+@@ -241,7 +241,7 @@ score_timezone(const char *tzname, struct tztry *tt)
+ 	pg_tz	   *tz;
+ 
+ 	/* Load timezone definition */
+-	tz = pg_load_tz(tzname);
++	tz = pg_load_tz(_tzname);
+ 	if (!tz)
+ 		return -1;				/* unrecognized zone name */
+ 
+@@ -249,7 +249,7 @@ score_timezone(const char *tzname, struct tztry *tt)
+ 	if (!pg_tz_acceptable(tz))
+ 	{
+ #ifdef DEBUG_IDENTIFY_TIMEZONE
+-		fprintf(stderr, "Reject TZ \"%s\": uses leap seconds\n", tzname);
++		fprintf(stderr, "Reject TZ \"%s\": uses leap seconds\n", _tzname);
+ #endif
+ 		return -1;
+ 	}
+@@ -266,7 +266,7 @@ score_timezone(const char *tzname, struct tztry *tt)
+ 		{
+ #ifdef DEBUG_IDENTIFY_TIMEZONE
+ 			fprintf(stderr, "TZ \"%s\" scores %d: at %ld %04d-%02d-%02d %02d:%02d:%02d %s, system had no data\n",
+-					tzname, i, (long) pgtt,
++					_tzname, i, (long) pgtt,
+ 					pgtm->tm_year + 1900, pgtm->tm_mon + 1, pgtm->tm_mday,
+ 					pgtm->tm_hour, pgtm->tm_min, pgtm->tm_sec,
+ 					pgtm->tm_isdst ? "dst" : "std");
+@@ -277,7 +277,7 @@ score_timezone(const char *tzname, struct tztry *tt)
+ 		{
+ #ifdef DEBUG_IDENTIFY_TIMEZONE
+ 			fprintf(stderr, "TZ \"%s\" scores %d: at %ld %04d-%02d-%02d %02d:%02d:%02d %s versus %04d-%02d-%02d %02d:%02d:%02d %s\n",
+-					tzname, i, (long) pgtt,
++					_tzname, i, (long) pgtt,
+ 					pgtm->tm_year + 1900, pgtm->tm_mon + 1, pgtm->tm_mday,
+ 					pgtm->tm_hour, pgtm->tm_min, pgtm->tm_sec,
+ 					pgtm->tm_isdst ? "dst" : "std",
+@@ -298,7 +298,7 @@ score_timezone(const char *tzname, struct tztry *tt)
+ 			{
+ #ifdef DEBUG_IDENTIFY_TIMEZONE
+ 				fprintf(stderr, "TZ \"%s\" scores %d: at %ld \"%s\" versus \"%s\"\n",
+-						tzname, i, (long) pgtt,
++						_tzname, i, (long) pgtt,
+ 						pgtm->tm_zone, cbuf);
+ #endif
+ 				return i;
+@@ -307,7 +307,7 @@ score_timezone(const char *tzname, struct tztry *tt)
+ 	}
+ 
+ #ifdef DEBUG_IDENTIFY_TIMEZONE
+-	fprintf(stderr, "TZ \"%s\" gets max score %d\n", tzname, i);
++	fprintf(stderr, "TZ \"%s\" gets max score %d\n", _tzname, i);
+ #endif
+ 
+ 	return i;
+@@ -317,9 +317,9 @@ score_timezone(const char *tzname, struct tztry *tt)
+  * Test whether given zone name is a perfect match to localtime() behavior
+  */
+ static bool
+-perfect_timezone_match(const char *tzname, struct tztry *tt)
++perfect_timezone_match(const char *_tzname, struct tztry *tt)
+ {
+-	return (score_timezone(tzname, tt) == tt->n_test_times);
++	return (score_timezone(_tzname, tt) == tt->n_test_times);
+ }
+ 
+ 
+@@ -1565,7 +1565,7 @@ static const char *
+ identify_system_timezone(void)
+ {
+ 	int			i;
+-	char		tzname[128];
++	char		_tzname[128];
+ 	char		localtzname[256];
+ 	time_t		t = time(NULL);
+ 	struct tm  *tm = localtime(&t);
+@@ -1580,17 +1580,17 @@ identify_system_timezone(void)
+ 		return NULL;			/* go to GMT */
+ 	}
+ 
+-	memset(tzname, 0, sizeof(tzname));
+-	strftime(tzname, sizeof(tzname) - 1, "%Z", tm);
++	memset(_tzname, 0, sizeof(_tzname));
++	strftime(_tzname, sizeof(_tzname) - 1, "%Z", tm);
+ 
+ 	for (i = 0; win32_tzmap[i].stdname != NULL; i++)
+ 	{
+-		if (strcmp(tzname, win32_tzmap[i].stdname) == 0 ||
+-			strcmp(tzname, win32_tzmap[i].dstname) == 0)
++		if (strcmp(_tzname, win32_tzmap[i].stdname) == 0 ||
++			strcmp(_tzname, win32_tzmap[i].dstname) == 0)
+ 		{
+ #ifdef DEBUG_IDENTIFY_TIMEZONE
+ 			fprintf(stderr, "TZ \"%s\" matches system time zone \"%s\"\n",
+-					win32_tzmap[i].pgtzname, tzname);
++					win32_tzmap[i].pgtzname, _tzname);
+ #endif
+ 			return win32_tzmap[i].pgtzname;
+ 		}
+@@ -1664,7 +1664,7 @@ identify_system_timezone(void)
+ 			RegCloseKey(key);
+ 			continue;			/* Proceed to look at the next timezone */
+ 		}
+-		if (strcmp(tzname, zonename) == 0)
++		if (strcmp(_tzname, zonename) == 0)
+ 		{
+ 			/* Matched zone */
+ 			strcpy(localtzname, keyname);
+@@ -1682,7 +1682,7 @@ identify_system_timezone(void)
+ 			RegCloseKey(key);
+ 			continue;			/* Proceed to look at the next timezone */
+ 		}
+-		if (strcmp(tzname, zonename) == 0)
++		if (strcmp(_tzname, zonename) == 0)
+ 		{
+ 			/* Matched DST zone */
+ 			strcpy(localtzname, keyname);
+@@ -1705,7 +1705,7 @@ identify_system_timezone(void)
+ 			{
+ #ifdef DEBUG_IDENTIFY_TIMEZONE
+ 				fprintf(stderr, "TZ \"%s\" matches localized system time zone \"%s\" (\"%s\")\n",
+-						win32_tzmap[i].pgtzname, tzname, localtzname);
++						win32_tzmap[i].pgtzname, _tzname, localtzname);
+ #endif
+ 				return win32_tzmap[i].pgtzname;
+ 			}
+@@ -1714,7 +1714,7 @@ identify_system_timezone(void)
+ 
+ #ifdef DEBUG_IDENTIFY_TIMEZONE
+ 	fprintf(stderr, "could not find a match for system time zone \"%s\"\n",
+-			tzname);
++			_tzname);
+ #endif
+ 	return NULL;				/* go to GMT */
+ }
+@@ -1725,14 +1725,14 @@ identify_system_timezone(void)
+  * Return true if the given zone name is valid and is an "acceptable" zone.
+  */
+ static bool
+-validate_zone(const char *tzname)
++validate_zone(const char *_tzname)
+ {
+ 	pg_tz	   *tz;
+ 
+-	if (!tzname || !tzname[0])
++	if (!_tzname || !_tzname[0])
+ 		return false;
+ 
+-	tz = pg_load_tz(tzname);
++	tz = pg_load_tz(_tzname);
+ 	if (!tz)
+ 		return false;
+ 
+@@ -1756,7 +1756,7 @@ validate_zone(const char *tzname)
+ const char *
+ select_default_timezone(const char *share_path)
+ {
+-	const char *tzname;
++	const char *_tzname;
+ 
+ 	/* Initialize timezone directory path, if needed */
+ #ifndef SYSTEMTZDIR
+@@ -1764,14 +1764,14 @@ select_default_timezone(const char *share_path)
+ #endif
+ 
+ 	/* Check TZ environment variable */
+-	tzname = getenv("TZ");
+-	if (validate_zone(tzname))
+-		return tzname;
++	_tzname = getenv("TZ");
++	if (validate_zone(_tzname))
++		return _tzname;
+ 
+ 	/* Nope, so try to identify the system timezone */
+-	tzname = identify_system_timezone();
+-	if (validate_zone(tzname))
+-		return tzname;
++	_tzname = identify_system_timezone();
++	if (validate_zone(_tzname))
++		return _tzname;
+ 
+ 	return NULL;
+ }

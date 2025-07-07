@@ -1,0 +1,104 @@
+diff --git a/src/backend/utils/adt/timestamp.c b/src/backend/utils/adt/timestamp.c
+index 139169d7c9b..b32a18529c4 100644
+--- a/src/backend/utils/adt/timestamp.c
++++ b/src/backend/utils/adt/timestamp.c
+@@ -494,7 +494,7 @@ parse_sane_timezone(struct pg_tm *tm, text *zone)
+ 	int			dterr;
+ 	int			tz;
+ 
+-	text_to_cstring_buffer(zone, tzname_, sizeof(tzname));
++	text_to_cstring_buffer(zone, tzname_, sizeof(tzname_));
+ 
+ 	/*
+ 	 * Look up the requested timezone.  First we try to interpret it as a
+@@ -523,13 +523,13 @@ parse_sane_timezone(struct pg_tm *tm, text *zone)
+ 		if (dterr == DTERR_TZDISP_OVERFLOW)
+ 			ereport(ERROR,
+ 					(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+-					 errmsg("numeric time zone \"%s\" out of range", tzname)));
++					 errmsg("numeric time zone \"%s\" out of range", tzname_)));
+ 		else if (dterr != DTERR_BAD_FORMAT)
+ 			ereport(ERROR,
+ 					(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+-					 errmsg("time zone \"%s\" not recognized", tzname)));
++					 errmsg("time zone \"%s\" not recognized", tzname_)));
+ 
+-		type = DecodeTimezoneName(tzname, &val, &tzp);
++		type = DecodeTimezoneName(tzname_, &val, &tzp);
+ 
+ 		if (type == TZNAME_FIXED_OFFSET)
+ 		{
+@@ -539,7 +539,7 @@ parse_sane_timezone(struct pg_tm *tm, text *zone)
+ 		else if (type == TZNAME_DYNTZ)
+ 		{
+ 			/* dynamic-offset abbreviation, resolve using specified time */
+-			tz = DetermineTimeZoneAbbrevOffset(tm, tzname, tzp);
++			tz = DetermineTimeZoneAbbrevOffset(tm, tzname_, tzp);
+ 		}
+ 		else
+ 		{
+@@ -559,11 +559,11 @@ parse_sane_timezone(struct pg_tm *tm, text *zone)
+ static pg_tz *
+ lookup_timezone(text *zone)
+ {
+-	char		tzname[TZ_STRLEN_MAX + 1];
++	char		tzname_[TZ_STRLEN_MAX + 1];
+ 
+-	text_to_cstring_buffer(zone, tzname, sizeof(tzname));
++	text_to_cstring_buffer(zone, tzname_, sizeof(tzname_));
+ 
+-	return DecodeTimezoneNameToTz(tzname);
++	return DecodeTimezoneNameToTz(tzname_);
+ }
+ 
+ /*
+@@ -2304,12 +2304,11 @@ timestamp_sortsupport(PG_FUNCTION_ARGS)
+ #endif
+ 	PG_RETURN_VOID();
+ }
+-
+ /* note: this is used for timestamptz also */
+ static Datum
+ timestamp_decrement(Relation rel, Datum existing, bool *underflow)
+ {
+-	Timestamp	texisting = DatumGetTimestamp(existing);
++	Timestamp       texisting = DatumGetTimestamp(existing);
+ 
+ 	if (texisting == PG_INT64_MIN)
+ 	{
+@@ -2326,7 +2325,7 @@ timestamp_decrement(Relation rel, Datum existing, bool *underflow)
+ static Datum
+ timestamp_increment(Relation rel, Datum existing, bool *overflow)
+ {
+-	Timestamp	texisting = DatumGetTimestamp(existing);
++	Timestamp       texisting = DatumGetTimestamp(existing);
+ 
+ 	if (texisting == PG_INT64_MAX)
+ 	{
+@@ -2352,6 +2351,8 @@ timestamp_skipsupport(PG_FUNCTION_ARGS)
+ 	PG_RETURN_VOID();
+ }
+ 
++
++
+ Datum
+ timestamp_hash(PG_FUNCTION_ARGS)
+ {
+@@ -6342,7 +6343,7 @@ timestamp_zone(PG_FUNCTION_ARGS)
+ 	/*
+ 	 * Look up the requested timezone.
+ 	 */
+-	text_to_cstring_buffer(zone, tzname_, sizeof(tzname));
++	text_to_cstring_buffer(zone, tzname_, sizeof(tzname_));
+ 
+ 	type = DecodeTimezoneName(tzname_, &val, &tzp);
+ 
+@@ -6578,7 +6579,7 @@ timestamptz_zone(PG_FUNCTION_ARGS)
+ 	/*
+ 	 * Look up the requested timezone.
+ 	 */
+-	text_to_cstring_buffer(zone, tzname_, sizeof(tzname));
++	text_to_cstring_buffer(zone, tzname_, sizeof(tzname_));
+ 
+ 	type = DecodeTimezoneName(tzname_, &val, &tzp);
+ 
