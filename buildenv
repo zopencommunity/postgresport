@@ -2,6 +2,7 @@
 # bump: postgres-version /POSTGRES_VERSION="(.*)"/ https://github.com/postgres/postgres.git|semver:*
 # POSTGRES_VERSION="V.R.M" # Specify a stable release
 # export ZOPEN_STABLE_TAG="v${POSTGRES_VERSION}"
+export ZOPEN_DEV_TAG="REL_18_BETA1"
 
 ###
 ### Build control file for the postgres port
@@ -153,7 +154,7 @@ export ZOPEN_EXTRA_CXXFLAGS="-fPIC -m64" ## C++ compiler flags to append to CXXF
 #export ZOPEN_CHECK_TIMEOUT="" ## Timeout limit in seconds for the check program (defaults to '12600' # 3.5 hours)
 #export ZOPEN_CLEAN_OPTS="" ## Options to pass to clean up  program (defaults to 'clean')
 #export ZOPEN_CONFIGURE_MINIMAL="" ## Configuration program will not be passed CFLAGS, LDFLAGS, CPPFLAGS options but will get them from env vars.
-export ZOPEN_CONFIGURE_OPTS="--prefix=/u/sravani/postgresbin --without-icu --without-readline  --disable-rpath --enable-debug" ## Options to pass to configuration program (defaults to '--prefix=')
+export ZOPEN_CONFIGURE_OPTS="--prefix=/u/vks2003/postgresbin --without-icu --without-readline  --disable-rpath --enable-debug" ## Options to pass to configuration program (defaults to '--prefix=')
 export ZOPEN_EXTRA_CONFIGURE_OPTS="--with-template=linux" ## Extra configure options to pass to configuration program. (defaults to '')
 #export ZOPEN_INSTALL_OPTS="" ## Options to pass to installation program (defaults to 'install')
 #export ZOPEN_MAKE_MINIMAL="" ## Build program will not be passed CFLAGS, LDFLAGS, CPPFLAGS options but will get them from env vars.
