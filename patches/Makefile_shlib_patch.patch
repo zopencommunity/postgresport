@@ -1,5 +1,5 @@
 diff --git a/src/Makefile.shlib b/src/Makefile.shlib
-index fa81f6ffdd6..ae8d01edd6c 100644
+index fa81f6f..ac9cf5d 100644
 --- a/src/Makefile.shlib
 +++ b/src/Makefile.shlib
 @@ -183,6 +183,19 @@ ifeq ($(PORTNAME), linux)
@@ -22,7 +22,7 @@ index fa81f6ffdd6..ae8d01edd6c 100644
  ifeq ($(PORTNAME), solaris)
    LINK.shared		= $(COMPILER) -shared
    ifdef soname
-@@ -256,9 +269,20 @@ endif #haslibarule
+@@ -256,9 +269,24 @@ endif #haslibarule
  
  ifeq (,$(filter cygwin win32,$(PORTNAME)))
  
@@ -34,13 +34,18 @@ index fa81f6ffdd6..ae8d01edd6c 100644
 +  ) \
 +)
 +OBJS_NEW_1=$(foreach obj,$(OBJS_NEW),$(top_builddir)/$(obj))
-+OBJS+=$(OBJS_NEW_1)
++allobjfiles.txt:
++	@if [ ! -f allobjfiles.txt ]; then \
++          echo $(OBJS_NEW_1) > $(top_srcdir)/allobjfiles.txt; \
++ 	fi
++# OBJS+=$(OBJS_NEW_1)
 +endif
 +
  # Normal case
- $(shlib): $(OBJS) | $(SHLIB_PREREQS)
+-$(shlib): $(OBJS) | $(SHLIB_PREREQS)
 -	$(LINK.shared) -o $@ $(OBJS) $(LDFLAGS) $(LDFLAGS_SL) $(SHLIB_LINK)
-+	$(LINK.shared) -o $@ $(OBJS) $(LIBS) $(LDFLAGS) $(LDFLAGS_SL) $(SHLIB_LINK) $(SHLIB_LINK_INTERNAL) -Wl,-bMSGLEVEL=8
++$(shlib): $(OBJS) | $(SHLIB_PREREQS) allobjfiles.txt
++	$(LINK.shared) -o $@ $(OBJS) @$(top_srcdir)/allobjfiles.txt $(LIBS) $(LDFLAGS) $(LDFLAGS_SL) $(SHLIB_LINK) $(SHLIB_LINK_INTERNAL) -Wl,-bMSGLEVEL=8
  ifdef shlib_major
  # If we're using major and minor versions, then make a symlink to major-version-only.
  ifneq ($(shlib), $(shlib_major))

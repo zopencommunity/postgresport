@@ -15,9 +15,13 @@ index 00000000000..269314232d6
 +  ) \
 +)
 +OBJS_NEW_1=$(foreach obj,$(OBJS_NEW),$(top_builddir)/$(obj))
-+OBJS=$(OBJS_NEW_1)
++allobjfiles.txt:
++	@if [ ! -f allobjfiles.txt ]; then \
++          echo $(OBJS_NEW_1) > $(top_srcdir)/allobjfiles.txt; \
++ 	fi
++ # OBJS+=$(OBJS_NEW_1)
 +#
 +# Rule for building a shared library from a single .o file
 +%.so: %.o
-+	$(CC) $(CFLAGS) $(OBJS) $< $(LDFLAGS) $(LIBS) $(LDFLAGS_SL) -shared -o $@ -Wl,-bMSGLEVEL=8
++	$(CC) $(CFLAGS) $(OBJS) @$(top_srcdir)/allobjfiles.txt $< $(LDFLAGS) $(LIBS) $(LDFLAGS_SL) -shared -o $@ -Wl,-bMSGLEVEL=8
 +

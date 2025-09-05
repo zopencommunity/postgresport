@@ -143,8 +143,8 @@ zopen_get_version()
 ### Optional build control variables
 ###
 
-export ZOPEN_EXTRA_CFLAGS="-DO_CLOEXEC=0 -DMAP_ANON=0 -UZOSLIB_USE_CLIB_LOCALE -fvisibility=default -DUSE_SYS_SYSV -O0 -g" ## C compiler flags to append to CFLAGS (defaults to '').
-export ZOPEN_EXTRA_CPPFLAGS="-ferror-limit=1000 -DMAP_ANON=0 -fPIC -m64" ## C,C++ pre-processor flags to append to CPPFLAGS (defaults to '')
+export ZOPEN_EXTRA_CFLAGS="-mzos-target=zosv3r1 -DO_CLOEXEC=0 -UZOSLIB_USE_CLIB_LOCALE -D_OPEN_SYS_IF_EXT -fvisibility=default -O0 -g" ## C compiler flags to append to CFLAGS (defaults to '').
+export ZOPEN_EXTRA_CPPFLAGS="-ferror-limit=1000 -fPIC -m64" ## C,C++ pre-processor flags to append to CPPFLAGS (defaults to '')
 export ZOPEN_EXTRA_CXXFLAGS="-fPIC -m64" ## C++ compiler flags to append to CXXFLAGS (defaults to '')
 #export ZOPEN_EXTRA_LDFLAGS="" ## C,C++ linker flags to append to LDFLAGS (defaults to '')
 #export ZOPEN_EXTRA_LIBS="" ## C,C++ libraries to append to LIBS (defaults to '')
@@ -154,7 +154,7 @@ export ZOPEN_EXTRA_CXXFLAGS="-fPIC -m64" ## C++ compiler flags to append to CXXF
 #export ZOPEN_CHECK_TIMEOUT="" ## Timeout limit in seconds for the check program (defaults to '12600' # 3.5 hours)
 #export ZOPEN_CLEAN_OPTS="" ## Options to pass to clean up  program (defaults to 'clean')
 #export ZOPEN_CONFIGURE_MINIMAL="" ## Configuration program will not be passed CFLAGS, LDFLAGS, CPPFLAGS options but will get them from env vars.
-export ZOPEN_CONFIGURE_OPTS="--prefix=/u/vks2003/postgresbin --without-icu --without-readline  --disable-rpath --enable-debug" ## Options to pass to configuration program (defaults to '--prefix=')
+export ZOPEN_CONFIGURE_OPTS="--prefix=/home/sravani/postgresbin --without-icu --without-readline  --disable-rpath --enable-debug" ## Options to pass to configuration program (defaults to '--prefix=')
 export ZOPEN_EXTRA_CONFIGURE_OPTS="--with-template=linux" ## Extra configure options to pass to configuration program. (defaults to '')
 #export ZOPEN_INSTALL_OPTS="" ## Options to pass to installation program (defaults to 'install')
 #export ZOPEN_MAKE_MINIMAL="" ## Build program will not be passed CFLAGS, LDFLAGS, CPPFLAGS options but will get them from env vars.
