@@ -1,13 +1,15 @@
 diff --git a/src/bin/pg_test_fsync/pg_test_fsync.c b/src/bin/pg_test_fsync/pg_test_fsync.c
-index 0060ea15902..d8ea5a2fbcf 100644
+index 0060ea1..eb0f049 100644
 --- a/src/bin/pg_test_fsync/pg_test_fsync.c
 +++ b/src/bin/pg_test_fsync/pg_test_fsync.c
-@@ -346,7 +346,9 @@ test_sync(int writes_per_op)
+@@ -346,7 +346,11 @@ test_sync(int writes_per_op)
  						  XLOG_BLCKSZ,
  						  writes * XLOG_BLCKSZ) != XLOG_BLCKSZ)
  				die("write failed");
 +#ifndef __MVS__
  		fdatasync(tmpfile);
++#else
++		fsync(tmpfile);
 +#endif
  	}
  	STOP_TIMER;

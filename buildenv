@@ -1,7 +1,7 @@
 # Update bump details accordingly. Use bump check to confirm.
 # bump: postgres-version /POSTGRES_VERSION="(.*)"/ https://github.com/postgres/postgres.git|semver:*
 # POSTGRES_VERSION="V.R.M" # Specify a stable release
-# export ZOPEN_STABLE_TAG="v${POSTGRES_VERSION}"
+export ZOPEN_STABLE_TAG="REL_18_BETA2"
 export ZOPEN_DEV_TAG="REL_18_BETA1"
 
 ###

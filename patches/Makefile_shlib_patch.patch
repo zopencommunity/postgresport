@@ -1,8 +1,8 @@
 diff --git a/src/Makefile.shlib b/src/Makefile.shlib
-index fa81f6f..ac9cf5d 100644
+index fa81f6f..e58220e 100644
 --- a/src/Makefile.shlib
 +++ b/src/Makefile.shlib
-@@ -183,6 +183,19 @@ ifeq ($(PORTNAME), linux)
+@@ -183,6 +183,13 @@ ifeq ($(PORTNAME), linux)
    endif
  endif
  
@@ -10,35 +10,37 @@ index fa81f6f..ac9cf5d 100644
 +  LINK.shared   	= $(COMPILER)
 +  ifdef SHLIB_EXPORTS
 +    exports_file	= $(SHLIB_EXPORTS:%.txt=%.x)
-+#    $(exports_file): $(SHLIB_EXPORTS)
-+#    echo 'EXPORTS' > $@
-+#    $(AWK) '/^[^\#]/ {print $$1}' $< >> $@
-+#    LINK.shared	 += -Wl,export,$(exports_file)
-+  else
-+#    LINK.shared         += -Wl,export_all
 +  endif
 +endif
 +
  ifeq ($(PORTNAME), solaris)
    LINK.shared		= $(COMPILER) -shared
    ifdef soname
-@@ -256,9 +269,24 @@ endif #haslibarule
+@@ -256,9 +263,32 @@ endif #haslibarule
  
  ifeq (,$(filter cygwin win32,$(PORTNAME)))
  
 +ifeq ($(PORTNAME), zos)
-+OBJFILES_TXT=$(shell find $(top_builddir)/src/ -name objfiles.txt)
-+OBJS_NEW=$(strip \
++# get all the objfiles.txt in $(top_srcdir)/src/
++OBJFILES_TXT=$(shell find $(top_srcdir)/src/ -name objfiles.txt)
++
++# remove any newlines or tabs in the objfiles.txt files
++FORMATED_OBJFILES_TXT=$(strip \
 +  $(foreach file,$(OBJFILES_TXT), \
 +    $(shell tr ' \t\r\n' '\n\n\n\n' < $(file) | awk 'NF') \
 +  ) \
 +)
-+OBJS_NEW_1=$(foreach obj,$(OBJS_NEW),$(top_builddir)/$(obj))
++
++# combile all the object files names
++ALL_OBJFILES_TXT=$(foreach obj,$(OBJS_NEW),$(top_builddir)/$(obj))
++
++# this target will create a file allobjfiles.txt in teh $(top_srcdir)
++# which contains all the object files from all the subdirectories in
++# $(top_srcdir)/src/
 +allobjfiles.txt:
 +	@if [ ! -f allobjfiles.txt ]; then \
-+          echo $(OBJS_NEW_1) > $(top_srcdir)/allobjfiles.txt; \
-+ 	fi
-+# OBJS+=$(OBJS_NEW_1)
++          echo $(ALL_OBJFILES_TXT) > $(top_srcdir)/allobjfiles.txt; \
++	fi
 +endif
 +
  # Normal case
