@@ -4,10 +4,10 @@ PostgreSQL is an advanced object-relational database management system that supp
 ## Invoking the postgresql database
 With the current implementation we can invoke the postgresql database in the following way, execute the commands from the --prefix path
 1. Initializing the database cluster
-   $ bin/initdb -D mydb
+   `$ bin/initdb -D mydb`
 2. Change the `io_method` parameter(in file mydb/postgresql.conf) to `sync` from `worker`
 3. Execute the postgres command in single user mode
-   $ bin/postgres --single -D tempdb postgres
+   `$ bin/postgres --single -D tempdb postgres`
 4. This is prompt us a interactive terminal to execute SQL commands
 ```
 backend> CREATE TABLE test_table (id INT, name TEXT);
