@@ -1,0 +1,62 @@
+diff --git a/src/backend/port/sysv_shmem.c b/src/backend/port/sysv_shmem.c
+index 197926d44f6..448bb36a039 100644
+--- a/src/backend/port/sysv_shmem.c
++++ b/src/backend/port/sysv_shmem.c
+@@ -619,8 +619,12 @@ CreateAnonymousSegment(Size *size)
+ 		if (allocsize % hugepagesize != 0)
+ 			allocsize += hugepagesize - (allocsize % hugepagesize);
+ 
++#ifdef __MVS__
++		ptr = anon_mmap(NULL, allocsize);
++#else
+ 		ptr = mmap(NULL, allocsize, PROT_READ | PROT_WRITE,
+ 				   PG_MMAP_FLAGS | mmap_flags, -1, 0);
++#endif
+ 		mmap_errno = errno;
+ 		if (huge_pages == HUGE_PAGES_TRY && ptr == MAP_FAILED)
+ 			elog(DEBUG1, "mmap(%zu) with MAP_HUGETLB failed, huge pages disabled: %m",
+@@ -643,8 +647,12 @@ CreateAnonymousSegment(Size *size)
+ 		 * to non-huge pages.
+ 		 */
+ 		allocsize = *size;
++#ifdef __MVS__
++		ptr = anon_mmap(NULL, allocsize);
++#else
+ 		ptr = mmap(NULL, allocsize, PROT_READ | PROT_WRITE,
+ 				   PG_MMAP_FLAGS, -1, 0);
++#endif
+ 		mmap_errno = errno;
+ 	}
+ 
+@@ -677,7 +685,14 @@ AnonymousShmemDetach(int status, Datum arg)
+ 	/* Release anonymous shared memory block, if any. */
+ 	if (AnonymousShmem != NULL)
+ 	{
+-		if (munmap(AnonymousShmem, AnonymousShmemSize) < 0)
++		int retcode;
++#ifdef __MVS__
++		retcode = anon_munmap(AnonymousShmem, AnonymousShmemSize);
++#else
++		retcode = munmap(AnonymousShmem, AnonymousShmemSize);
++#endif
++//		if (munmap(AnonymousShmem, AnonymousShmemSize) < 0)
++		if (retcode < 0)
+ 			elog(LOG, "munmap(%p, %zu) failed: %m",
+ 				 AnonymousShmem, AnonymousShmemSize);
+ 		AnonymousShmem = NULL;
+@@ -983,7 +998,14 @@ PGSharedMemoryDetach(void)
+ 
+ 	if (AnonymousShmem != NULL)
+ 	{
+-		if (munmap(AnonymousShmem, AnonymousShmemSize) < 0)
++		int retcode;
++#ifdef __MVS__
++		retcode = anon_munmap(AnonymousShmem, AnonymousShmemSize);
++#else
++		retcode = munmap(AnonymousShmem, AnonymousShmemSize);
++#endif
++//		if (munmap(AnonymousShmem, AnonymousShmemSize) < 0)
++		if (retcode < 0)
+ 			elog(LOG, "munmap(%p, %zu) failed: %m",
+ 				 AnonymousShmem, AnonymousShmemSize);
+ 		AnonymousShmem = NULL;

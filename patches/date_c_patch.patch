@@ -1,0 +1,15 @@
+diff --git a/src/backend/utils/adt/date.c b/src/backend/utils/adt/date.c
+index 4227ab1..0ed9e01 100644
+--- a/src/backend/utils/adt/date.c
++++ b/src/backend/utils/adt/date.c
+@@ -37,6 +37,10 @@
+ #include "utils/skipsupport.h"
+ #include "utils/sortsupport.h"
+ 
++#ifdef __MVS__
++#define tzname _tzname
++#endif
++
+ /*
+  * gcc's -ffast-math switch breaks routines that expect exact results from
+  * expressions like timeval / SECS_PER_HOUR, where timeval is double.

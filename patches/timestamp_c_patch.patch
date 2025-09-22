@@ -1,0 +1,137 @@
+diff --git a/src/backend/utils/adt/timestamp.c b/src/backend/utils/adt/timestamp.c
+index 347089b..ff4eeec 100644
+--- a/src/backend/utils/adt/timestamp.c
++++ b/src/backend/utils/adt/timestamp.c
+@@ -490,11 +490,11 @@ timestamptz_in(PG_FUNCTION_ARGS)
+ static int
+ parse_sane_timezone(struct pg_tm *tm, text *zone)
+ {
+-	char		tzname[TZ_STRLEN_MAX + 1];
++	char		tzname_[TZ_STRLEN_MAX + 1];
+ 	int			dterr;
+ 	int			tz;
+ 
+-	text_to_cstring_buffer(zone, tzname, sizeof(tzname));
++	text_to_cstring_buffer(zone, tzname_, sizeof(tzname_));
+ 
+ 	/*
+ 	 * Look up the requested timezone.  First we try to interpret it as a
+@@ -506,14 +506,14 @@ parse_sane_timezone(struct pg_tm *tm, text *zone)
+ 	 * as invalid, it's enough to disallow having a digit in the first
+ 	 * position of our input string.
+ 	 */
+-	if (isdigit((unsigned char) *tzname))
++	if (isdigit((unsigned char) *tzname_))
+ 		ereport(ERROR,
+ 				(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+ 				 errmsg("invalid input syntax for type %s: \"%s\"",
+-						"numeric time zone", tzname),
++						"numeric time zone", tzname_),
+ 				 errhint("Numeric time zones must have \"-\" or \"+\" as first character.")));
+ 
+-	dterr = DecodeTimezone(tzname, &tz);
++	dterr = DecodeTimezone(tzname_, &tz);
+ 	if (dterr != 0)
+ 	{
+ 		int			type,
+@@ -523,13 +523,13 @@ parse_sane_timezone(struct pg_tm *tm, text *zone)
+ 		if (dterr == DTERR_TZDISP_OVERFLOW)
+ 			ereport(ERROR,
+ 					(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+-					 errmsg("numeric time zone \"%s\" out of range", tzname)));
++					 errmsg("numeric time zone \"%s\" out of range", tzname_)));
+ 		else if (dterr != DTERR_BAD_FORMAT)
+ 			ereport(ERROR,
+ 					(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+-					 errmsg("time zone \"%s\" not recognized", tzname)));
++					 errmsg("time zone \"%s\" not recognized", tzname_)));
+ 
+-		type = DecodeTimezoneName(tzname, &val, &tzp);
++		type = DecodeTimezoneName(tzname_, &val, &tzp);
+ 
+ 		if (type == TZNAME_FIXED_OFFSET)
+ 		{
+@@ -539,7 +539,7 @@ parse_sane_timezone(struct pg_tm *tm, text *zone)
+ 		else if (type == TZNAME_DYNTZ)
+ 		{
+ 			/* dynamic-offset abbreviation, resolve using specified time */
+-			tz = DetermineTimeZoneAbbrevOffset(tm, tzname, tzp);
++			tz = DetermineTimeZoneAbbrevOffset(tm, tzname_, tzp);
+ 		}
+ 		else
+ 		{
+@@ -559,11 +559,11 @@ parse_sane_timezone(struct pg_tm *tm, text *zone)
+ static pg_tz *
+ lookup_timezone(text *zone)
+ {
+-	char		tzname[TZ_STRLEN_MAX + 1];
++	char		tzname_[TZ_STRLEN_MAX + 1];
+ 
+-	text_to_cstring_buffer(zone, tzname, sizeof(tzname));
++	text_to_cstring_buffer(zone, tzname_, sizeof(tzname_));
+ 
+-	return DecodeTimezoneNameToTz(tzname);
++	return DecodeTimezoneNameToTz(tzname_);
+ }
+ 
+ /*
+@@ -6329,7 +6329,7 @@ timestamp_zone(PG_FUNCTION_ARGS)
+ 	Timestamp	timestamp = PG_GETARG_TIMESTAMP(1);
+ 	TimestampTz result;
+ 	int			tz;
+-	char		tzname[TZ_STRLEN_MAX + 1];
++	char		tzname_[TZ_STRLEN_MAX + 1];
+ 	int			type,
+ 				val;
+ 	pg_tz	   *tzp;
+@@ -6342,9 +6342,9 @@ timestamp_zone(PG_FUNCTION_ARGS)
+ 	/*
+ 	 * Look up the requested timezone.
+ 	 */
+-	text_to_cstring_buffer(zone, tzname, sizeof(tzname));
++	text_to_cstring_buffer(zone, tzname_, sizeof(tzname_));
+ 
+-	type = DecodeTimezoneName(tzname, &val, &tzp);
++	type = DecodeTimezoneName(tzname_, &val, &tzp);
+ 
+ 	if (type == TZNAME_FIXED_OFFSET)
+ 	{
+@@ -6359,7 +6359,7 @@ timestamp_zone(PG_FUNCTION_ARGS)
+ 			ereport(ERROR,
+ 					(errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
+ 					 errmsg("timestamp out of range")));
+-		tz = -DetermineTimeZoneAbbrevOffset(&tm, tzname, tzp);
++		tz = -DetermineTimeZoneAbbrevOffset(&tm, tzname_, tzp);
+ 		result = dt2local(timestamp, tz);
+ 	}
+ 	else
+@@ -6567,7 +6567,7 @@ timestamptz_zone(PG_FUNCTION_ARGS)
+ 	TimestampTz timestamp = PG_GETARG_TIMESTAMPTZ(1);
+ 	Timestamp	result;
+ 	int			tz;
+-	char		tzname[TZ_STRLEN_MAX + 1];
++	char		tzname_[TZ_STRLEN_MAX + 1];
+ 	int			type,
+ 				val;
+ 	pg_tz	   *tzp;
+@@ -6578,9 +6578,9 @@ timestamptz_zone(PG_FUNCTION_ARGS)
+ 	/*
+ 	 * Look up the requested timezone.
+ 	 */
+-	text_to_cstring_buffer(zone, tzname, sizeof(tzname));
++	text_to_cstring_buffer(zone, tzname_, sizeof(tzname_));
+ 
+-	type = DecodeTimezoneName(tzname, &val, &tzp);
++	type = DecodeTimezoneName(tzname_, &val, &tzp);
+ 
+ 	if (type == TZNAME_FIXED_OFFSET)
+ 	{
+@@ -6593,7 +6593,7 @@ timestamptz_zone(PG_FUNCTION_ARGS)
+ 		/* dynamic-offset abbreviation, resolve using specified time */
+ 		int			isdst;
+ 
+-		tz = DetermineTimeZoneAbbrevOffsetTS(timestamp, tzname, tzp, &isdst);
++		tz = DetermineTimeZoneAbbrevOffsetTS(timestamp, tzname_, tzp, &isdst);
+ 		result = dt2local(timestamp, tz);
+ 	}
+ 	else

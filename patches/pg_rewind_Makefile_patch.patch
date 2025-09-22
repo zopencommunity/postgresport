@@ -1,0 +1,12 @@
+diff --git a/src/bin/pg_rewind/Makefile b/src/bin/pg_rewind/Makefile
+index cbd000b686d..11f25c89737 100644
+--- a/src/bin/pg_rewind/Makefile
++++ b/src/bin/pg_rewind/Makefile
+@@ -17,6 +17,7 @@ include $(top_builddir)/src/Makefile.global
+ 
+ override CPPFLAGS := -I$(libpq_srcdir) -DFRONTEND $(CPPFLAGS)
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport)
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ OBJS = \
+ 	$(WIN32RES) \

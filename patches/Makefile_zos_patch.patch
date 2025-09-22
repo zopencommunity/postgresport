@@ -1,0 +1,27 @@
+diff --git a/src/makefiles/Makefile.zos b/src/makefiles/Makefile.zos
+new file mode 100755
+index 00000000000..269314232d6
+--- /dev/null
++++ b/src/makefiles/Makefile.zos
+@@ -0,0 +1,17 @@
++# Use --enable-new-dtags to generate DT_RUNPATH instead of DT_RPATH.
++# This allows LD_LIBRARY_PATH to still work when needed.
++rpath = -Wl,-rpath,'$(rpathdir)',--enable-new-dtags
++
++OBJFILES_TXT=$(shell find $(top_builddir)/src/ -name objfiles.txt)
++OBJS_NEW=$(strip \
++  $(foreach file,$(OBJFILES_TXT), \
++    $(shell tr ' \t\r\n' '\n\n\n\n' < $(file) | awk 'NF') \
++  ) \
++)
++OBJS_NEW_1=$(foreach obj,$(OBJS_NEW),$(top_builddir)/$(obj))
++allobjfiles.txt:
++	@if [ ! -f allobjfiles.txt ]; then \
++          echo $(OBJS_NEW_1) > $(top_srcdir)/allobjfiles.txt; \
++ 	fi
++ # OBJS+=$(OBJS_NEW_1)
++#
++# Rule for building a shared library from a single .o file
++%.so: %.o
++	$(CC) $(CFLAGS) $(OBJS) @$(top_srcdir)/allobjfiles.txt $< $(LDFLAGS) $(LIBS) $(LDFLAGS_SL) -shared -o $@ -Wl,-bMSGLEVEL=8
++

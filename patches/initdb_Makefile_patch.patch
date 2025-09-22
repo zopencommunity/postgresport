@@ -1,0 +1,14 @@
+diff --git a/src/bin/initdb/Makefile b/src/bin/initdb/Makefile
+index 997e0a013e9..1f240713970 100644
+--- a/src/bin/initdb/Makefile
++++ b/src/bin/initdb/Makefile
+@@ -23,7 +23,8 @@ include $(top_builddir)/src/Makefile.global
+ override CPPFLAGS := -DUSE_PRIVATE_ENCODING_FUNCS -I$(libpq_srcdir) -I$(top_srcdir)/src/timezone $(ICU_CFLAGS) $(CPPFLAGS)
+ 
+ # We need libpq only because fe_utils does.
+-LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport) $(ICU_LIBS)
++LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport) -L$(top_srcdir)/src/common -lpgcommon $(ICU_LIBS)
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ # use system timezone data?
+ ifneq (,$(with_system_tzdata))

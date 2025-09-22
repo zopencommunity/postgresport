@@ -1,0 +1,12 @@
+diff --git a/src/bin/pg_amcheck/Makefile b/src/bin/pg_amcheck/Makefile
+index fa6071f97c1..73f3fe6bcfc 100644
+--- a/src/bin/pg_amcheck/Makefile
++++ b/src/bin/pg_amcheck/Makefile
+@@ -20,6 +20,7 @@ include $(top_builddir)/src/Makefile.global
+ 
+ override CPPFLAGS := -I$(libpq_srcdir) $(CPPFLAGS)
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport)
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ OBJS = \
+ 	$(WIN32RES) \

@@ -1,0 +1,16 @@
+diff --git a/src/backend/storage/file/fd.c b/src/backend/storage/file/fd.c
+index 0e8299d..02e62a6 100644
+--- a/src/backend/storage/file/fd.c
++++ b/src/backend/storage/file/fd.c
+@@ -485,7 +485,11 @@ pg_fdatasync(int fd)
+ 		return 0;
+ 
+ retry:
++#ifndef __MVS__
+ 	rc = fdatasync(fd);
++#else
++	rc = fsync(fd);
++#endif
+ 
+ 	if (rc == -1 && errno == EINTR)
+ 		goto retry;

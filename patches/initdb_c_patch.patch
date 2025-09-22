@@ -1,0 +1,13 @@
+diff --git a/src/bin/initdb/initdb.c b/src/bin/initdb/initdb.c
+index 62bbd08d9f6..2d91db8b02d 100644
+--- a/src/bin/initdb/initdb.c
++++ b/src/bin/initdb/initdb.c
+@@ -1075,7 +1075,7 @@ set_null_conf(void)
+ static const char *
+ choose_dsm_implementation(void)
+ {
+-#if defined(HAVE_SHM_OPEN) && !defined(__sun__)
++#if defined(HAVE_SHM_OPEN) && !defined(__sun__) && !defined(__MVS__)
+ 	int			ntries = 10;
+ 	pg_prng_state prng_state;
+ 
