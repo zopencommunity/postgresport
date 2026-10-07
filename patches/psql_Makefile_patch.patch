@@ -1,0 +1,12 @@
+diff --git a/src/bin/psql/Makefile b/src/bin/psql/Makefile
+index 5b1545d9948..0cfb5423c75 100644
+--- a/src/bin/psql/Makefile
++++ b/src/bin/psql/Makefile
+@@ -23,6 +23,7 @@ REFDOCDIR= $(top_srcdir)/doc/src/sgml/ref
+ 
+ override CPPFLAGS := -I. -I$(srcdir) -I$(libpq_srcdir) $(CPPFLAGS)
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport)
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ OBJS = \
+ 	$(WIN32RES) \

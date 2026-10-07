@@ -1,0 +1,7 @@
+diff --git a/src/include/port/zos.h b/src/include/port/zos.h
+new file mode 100644
+index 00000000000..5b8810ed3d0
+--- /dev/null
++++ b/src/include/port/zos.h
+@@ -0,0 +1 @@
++//created empty file as postgres configure step requires the zos.h

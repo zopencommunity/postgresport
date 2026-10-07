@@ -1,0 +1,13 @@
+diff --git a/src/backend/access/common/Makefile b/src/backend/access/common/Makefile
+index e78de312659..637fd251859 100644
+--- a/src/backend/access/common/Makefile
++++ b/src/backend/access/common/Makefile
+@@ -29,6 +29,7 @@ OBJS = \
+ 	toast_compression.o \
+ 	toast_internals.o \
+ 	tupconvert.o \
+-	tupdesc.o
++	tupdesc.o \
++	file.o
+ 
+ include $(top_srcdir)/src/backend/common.mk

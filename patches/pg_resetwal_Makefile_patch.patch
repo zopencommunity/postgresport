@@ -1,0 +1,12 @@
+diff --git a/src/bin/pg_resetwal/Makefile b/src/bin/pg_resetwal/Makefile
+index 82bea06dee5..1c20e9c8089 100644
+--- a/src/bin/pg_resetwal/Makefile
++++ b/src/bin/pg_resetwal/Makefile
+@@ -16,6 +16,7 @@ top_builddir = ../../..
+ include $(top_builddir)/src/Makefile.global
+ 
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ OBJS = \
+ 	$(WIN32RES) \

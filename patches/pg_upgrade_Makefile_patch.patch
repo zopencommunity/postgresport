@@ -1,0 +1,12 @@
+diff --git a/src/bin/pg_upgrade/Makefile b/src/bin/pg_upgrade/Makefile
+index f83d2b5d309..dceeb77bbd0 100644
+--- a/src/bin/pg_upgrade/Makefile
++++ b/src/bin/pg_upgrade/Makefile
+@@ -31,6 +31,7 @@ OBJS = \
+ 
+ override CPPFLAGS := -I$(srcdir) -I$(libpq_srcdir) $(CPPFLAGS)
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport)
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ # required for 002_pg_upgrade.pl
+ REGRESS_SHLIB=$(abs_top_builddir)/src/test/regress/regress$(DLSUFFIX)

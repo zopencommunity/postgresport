@@ -1,0 +1,12 @@
+diff --git a/src/bin/pg_checksums/Makefile b/src/bin/pg_checksums/Makefile
+index a7f6d9c7c5c..ddb3b09ef93 100644
+--- a/src/bin/pg_checksums/Makefile
++++ b/src/bin/pg_checksums/Makefile
+@@ -17,6 +17,7 @@ include $(top_builddir)/src/Makefile.global
+ 
+ # We need libpq only because fe_utils does.
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport)
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ OBJS = \
+ 	$(WIN32RES) \

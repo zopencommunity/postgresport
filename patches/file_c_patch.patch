@@ -1,0 +1,76 @@
+diff --git a/src/backend/access/common/file.c b/src/backend/access/common/file.c
+new file mode 100755
+index 00000000000..1d7eb32716e
+--- /dev/null
++++ b/src/backend/access/common/file.c
+@@ -0,0 +1,70 @@
++#undef ZOSLIB_USE_CLIB_LOCALE
++#include <c++/support/ibm/locale_mgmt_aix.h>
++#include <locale.h>
++#include <wchar.h>
++#include <time.h>
++int isalnum_l(int c, locale_t locale) { return isalnum(c); }
++int isalpha_l(int c, locale_t locale) { return isalpha(c); }
++int isdigit_l(int c, locale_t locale) { return isdigit(c); }
++int isgraph_l(int c, locale_t locale) { return isgraph(c); }
++int islower_l(int c, locale_t locale) { return islower(c); }
++int isprint_l(int c, locale_t locale) { return isprint(c); }
++
++int ispunct_l(int c, locale_t locale) { return ispunct(c); }
++int isspace_l(int c, locale_t locale) { return isspace(c); }
++int isupper_l(int c, locale_t locale) { return isupper(c); }
++
++int iswalnum_l(wchar_t wc, locale_t locale) {
++  return iswalnum(wc);
++}
++int iswalpha_l(wchar_t wc, locale_t locale) {
++  return iswalpha(wc);
++}
++int iswblank_l(wchar_t wc, locale_t locale) {
++  return iswblank(wc);
++}
++int iswlower_l(wchar_t wc, locale_t locale) {
++  return iswlower(wc);
++}
++int iswgraph_l(wchar_t wc, locale_t locale) {
++  return iswgraph(wc);
++}
++int iswprint_l(wchar_t wc, locale_t locale) {
++  return iswprint(wc);
++}
++int iswpunct_l(wchar_t wc, locale_t locale) {
++  return iswpunct(wc);
++}
++int iswspace_l(wchar_t wc, locale_t locale) {
++  return iswspace(wc);
++}
++
++int iswupper_l(wchar_t wc, locale_t locale) {
++  return iswupper(wc);
++}
++
++int iswdigit_l(wchar_t wc, locale_t locale) {
++  return iswdigit(wc);
++}
++
++int toupper_l(int c, locale_t locale) { return toupper(c); }
++int tolower_l(int c, locale_t locale) { return tolower(c); }
++
++wint_t towupper_l(wint_t wc, locale_t locale) {
++  return towupper(wc);
++}
++wint_t towlower_l(wint_t wc, locale_t locale) {
++  return towlower(wc);
++}
++int strcoll_l(const char *__s1, const char *__s2,
++                            locale_t locale) {
++  return strcoll(__s1, __s2);
++}
++size_t strxfrm_l(char *__s1, const char *__s2, size_t __n,
++                               locale_t locale) {
++  return strxfrm(__s1, __s2, __n);
++}
++size_t strftime_l(char *dst, size_t dstlen, const char *format, const struct tm *tm, 
++			locale_t locale) {
++  return strftime(dst, dstlen, format, tm); 
++}

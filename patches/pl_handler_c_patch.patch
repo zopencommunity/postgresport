@@ -1,0 +1,23 @@
+diff --git a/src/pl/plpgsql/src/pl_handler.c b/src/pl/plpgsql/src/pl_handler.c
+index e9a7292..0931fd7 100644
+--- a/src/pl/plpgsql/src/pl_handler.c
++++ b/src/pl/plpgsql/src/pl_handler.c
+@@ -152,7 +152,9 @@ _PG_init(void)
+ 
+ 	if (inited)
+ 		return;
+-
++//	MemoryContextInit();
++//	InitializeGUCOptions();
++	build_guc_variables();
+ 	pg_bindtextdomain(TEXTDOMAIN);
+ 
+ 	DefineCustomEnumVariable("plpgsql.variable_conflict",
+@@ -202,6 +204,7 @@ _PG_init(void)
+ 
+ 	MarkGUCPrefixReserved("plpgsql");
+ 
++	MemoryContextInit();
+ 	RegisterXactCallback(plpgsql_xact_cb, NULL);
+ 	RegisterSubXactCallback(plpgsql_subxact_cb, NULL);
+ 

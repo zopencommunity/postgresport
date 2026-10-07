@@ -1,0 +1,12 @@
+diff --git a/configure b/configure
+index 6d7c22e153f..e1c9925036e 100755
+--- a/configure
++++ b/configure
+@@ -3028,6 +3028,7 @@ dragonfly*) template=netbsd ;;
+  freebsd*) template=freebsd ;;
+  linux*|gnu*|k*bsd*-gnu)
+            template=linux ;;
++ openedition*) template=zos ;;
+    mingw*) template=win32 ;;
+   netbsd*) template=netbsd ;;
+  openbsd*) template=openbsd ;;

@@ -1,0 +1,59 @@
+diff --git a/src/timezone/pgtz.c b/src/timezone/pgtz.c
+index 671b4d76237..f5a35b1317f 100644
+--- a/src/timezone/pgtz.c
++++ b/src/timezone/pgtz.c
+@@ -231,7 +231,7 @@ init_timezone_hashtable(void)
+  * default timezone setting is later overridden from postgresql.conf.
+  */
+ pg_tz *
+-pg_tzset(const char *tzname)
++pg_tzset(const char *tzname_)
+ {
+ 	pg_tz_cache *tzp;
+ 	struct state tzstate;
+@@ -239,7 +239,7 @@ pg_tzset(const char *tzname)
+ 	char		canonname[TZ_STRLEN_MAX + 1];
+ 	char	   *p;
+ 
+-	if (strlen(tzname) > TZ_STRLEN_MAX)
++	if (strlen(tzname_) > TZ_STRLEN_MAX)
+ 		return NULL;			/* not going to fit */
+ 
+ 	if (!timezone_cache)
+@@ -253,8 +253,8 @@ pg_tzset(const char *tzname)
+ 	 * a POSIX-style timezone spec.)
+ 	 */
+ 	p = uppername;
+-	while (*tzname)
+-		*p++ = pg_toupper((unsigned char) *tzname++);
++	while (*tzname_)
++		*p++ = pg_toupper((unsigned char) *tzname_++);
+ 	*p = '\0';
+ 
+ 	tzp = (pg_tz_cache *) hash_search(timezone_cache,
+@@ -321,7 +321,7 @@ pg_tzset_offset(long gmtoffset)
+ {
+ 	long		absoffset = (gmtoffset < 0) ? -gmtoffset : gmtoffset;
+ 	char		offsetstr[64];
+-	char		tzname[128];
++	char		tzname_[128];
+ 
+ 	snprintf(offsetstr, sizeof(offsetstr),
+ 			 "%02ld", absoffset / SECS_PER_HOUR);
+@@ -338,13 +338,13 @@ pg_tzset_offset(long gmtoffset)
+ 					 ":%02ld", absoffset);
+ 	}
+ 	if (gmtoffset > 0)
+-		snprintf(tzname, sizeof(tzname), "<-%s>+%s",
++		snprintf(tzname_, sizeof(tzname_), "<-%s>+%s",
+ 				 offsetstr, offsetstr);
+ 	else
+-		snprintf(tzname, sizeof(tzname), "<+%s>-%s",
++		snprintf(tzname_, sizeof(tzname_), "<+%s>-%s",
+ 				 offsetstr, offsetstr);
+ 
+-	return pg_tzset(tzname);
++	return pg_tzset(tzname_);
+ }
+ 
+ 

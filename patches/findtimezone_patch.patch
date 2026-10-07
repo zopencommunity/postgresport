@@ -1,0 +1,15 @@
+diff --git a/src/bin/initdb/findtimezone.c b/src/bin/initdb/findtimezone.c
+index 2b2ae39..5910356 100644
+--- a/src/bin/initdb/findtimezone.c
++++ b/src/bin/initdb/findtimezone.c
+@@ -19,6 +19,10 @@
+ 
+ #include "pgtz.h"
+ 
++#ifdef __MVS__
++#define tzname _tzname
++#endif
++
+ /* Ideally this would be in a .h file, but it hardly seems worth the trouble */
+ extern const char *select_default_timezone(const char *share_path);
+ 

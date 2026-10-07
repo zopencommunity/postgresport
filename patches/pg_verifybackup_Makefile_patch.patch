@@ -1,0 +1,12 @@
+diff --git a/src/bin/pg_verifybackup/Makefile b/src/bin/pg_verifybackup/Makefile
+index 374d4a8afd1..036cdf5e379 100644
+--- a/src/bin/pg_verifybackup/Makefile
++++ b/src/bin/pg_verifybackup/Makefile
+@@ -19,6 +19,7 @@ include $(top_builddir)/src/Makefile.global
+ # We need libpq only because fe_utils does.
+ override CPPFLAGS := -I$(libpq_srcdir) $(CPPFLAGS)
+ LDFLAGS_INTERNAL += -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport)
++LIBS+=$(LDFLAGS_INTERNAL)
+ 
+ OBJS = \
+ 	$(WIN32RES) \
